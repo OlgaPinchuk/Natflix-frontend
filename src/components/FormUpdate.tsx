@@ -5,7 +5,6 @@ import { FormEvent, useState } from "react";
 import ListInput from "components/ListInput";
 import { generateFields } from "scripts/formUtilities";
 import { useModal } from "state/ModalContext";
-import { HEADERS } from "constants/api";
 import ApiMethod from "types/eApiMethods";
 
 interface iProps {
@@ -19,22 +18,39 @@ export default function FormUpdate({ endPoint, fields, data }: iProps) {
   const { setModal } = useModal();
 
   // Local state
-  const [form, setForm] = useState(generateFields(fields, data));
+  const [form, setForm] = useState<Record<string, any>>(
+    generateFields(fields, data)
+  );
 
   const updateEndpoint = `${endPoint}/${data.id}/update`;
-
-  console.log({ updateEndpoint });
-  console.log({ data });
 
   // Methods
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     const editedItem = { ...form, id: data.id };
-
     event.preventDefault();
+
+    const formData = new FormData();
+
+    for (const key in form) {
+      if (form.hasOwnProperty(key)) {
+        if (key === "banner_url" || key === "thumbnail_url") {
+          const fileData = form[key];
+          const initialImage = "picture.png";
+          const imageFile = new File([fileData], initialImage, {
+            type: "image/png",
+          });
+
+          formData.append(key, imageFile);
+        } else {
+          const formDataValue = form[key];
+          formData.append(key, formDataValue);
+        }
+      }
+    }
+
     fetch(updateEndpoint, {
-      headers: HEADERS,
       method: ApiMethod.PUT,
-      body: JSON.stringify(editedItem),
+      body: formData,
     })
       .then(onSuccess)
       .catch((error) => onFailure(error));

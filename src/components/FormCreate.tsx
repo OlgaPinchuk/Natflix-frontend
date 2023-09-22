@@ -17,7 +17,7 @@ export default function FormCreate({ endPoint, fields }: iProps) {
   const { setModal } = useModal();
 
   // Local state
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState<Record<string, any>>({});
 
   // Derived state
   const createEndpoint = endPoint + "/create";
@@ -25,10 +25,29 @@ export default function FormCreate({ endPoint, fields }: iProps) {
   // Methods
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    const formData = new FormData();
+
+    for (const key in form) {
+      if (form.hasOwnProperty(key)) {
+        if (key === "banner_url" || key === "thumbnail_url") {
+          const fileData = form[key];
+          const initialImage = "picture.png";
+          const imageFile = new File([fileData], initialImage, {
+            type: "image/png",
+          });
+
+          formData.append(key, imageFile);
+        } else {
+          const formDataValue = form[key];
+          formData.append(key, formDataValue);
+        }
+      }
+    }
+
     fetch(createEndpoint, {
       method: ApiMethod.POST,
-      headers: HEADERS,
-      body: JSON.stringify(form),
+      body: formData,
     })
       .then(onSuccess)
       .catch((error) => onFailure(error));
@@ -43,8 +62,6 @@ export default function FormCreate({ endPoint, fields }: iProps) {
     console.error(error);
     alert("Could not create item");
   }
-
-  console.log({ form });
 
   return (
     <form className="form" onSubmit={onSubmit}>

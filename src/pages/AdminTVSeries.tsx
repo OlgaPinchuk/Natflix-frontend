@@ -58,10 +58,6 @@ export default function AdminDetailSeries() {
   if (status === eStatus.LOADING) return <StatusLoading />;
   if (status === eStatus.ERROR) return <StatusError />;
 
-  console.log("Series data from fetch ", { data });
-
-  console.log("Fields ", { fields });
-
   return (
     <div className="admin-pages">
       <NavigationBarAdmin />
