@@ -13,6 +13,7 @@ interface iProps {
 
 export default function ItemAdminEpisode({ item, endPoint, fields }: iProps) {
   const { id, title, season_number, episode_number, thumbnail_url } = item;
+  console.log({ id, title, season_number, episode_number, thumbnail_url });
 
   // Global
   const { setModal } = useModal();

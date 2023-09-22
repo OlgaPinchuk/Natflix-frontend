@@ -16,6 +16,7 @@ import eStatus from "types/eStatus";
 import iTVSeries from "types/iTVSeries";
 import Item from "components/ItemAdminEpisode";
 import { useModal } from "state/ModalContext";
+import { ARI_ENDPOINT } from "constants/api";
 
 export default function AdminDetailSeries() {
   // Global state
@@ -27,12 +28,13 @@ export default function AdminDetailSeries() {
   const [data, setData] = useState(new Array<iTVSeries>());
 
   // Properties
-  const endPoint: string = "tv-series/:id/";
+  const endPoint: string = `${ARI_ENDPOINT}media/tv-series/${code}`;
 
   // Methods
   useEffect(() => {
-    fakeFetch(endPoint, code)
-      .then((response) => onSuccess(response.data))
+    fetch(endPoint)
+      .then((response) => response.json())
+      .then((data) => onSuccess(data))
       .catch((error) => onFailure(error));
   }, []);
 
@@ -55,6 +57,10 @@ export default function AdminDetailSeries() {
   // Safeguards
   if (status === eStatus.LOADING) return <StatusLoading />;
   if (status === eStatus.ERROR) return <StatusError />;
+
+  console.log("Series data from fetch ", { data });
+
+  console.log("Fields ", { fields });
 
   return (
     <div className="admin-pages">

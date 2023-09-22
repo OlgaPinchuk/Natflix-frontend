@@ -19,14 +19,21 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
 
   // Properties
-  const endPoint = "login/";
+  const endPoint = "http://localhost:8080/login";
+  const METHOD = "POST";
+  const HEADERS = { "Content-type": "application/json; charset=UTF-8" };
 
   // Methods
   function onSubmit(event: FormEvent): void {
     event.preventDefault();
 
-    fakeFetch(endPoint, form)
-      .then((response) => onSuccess(response.data))
+    fetch(endPoint, {
+      method: METHOD,
+      headers: HEADERS,
+      body: JSON.stringify(form),
+    })
+      .then((response) => response.json())
+      .then((json) => onSuccess(json))
       .catch((error) => onFailure(error));
   }
 

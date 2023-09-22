@@ -1,5 +1,5 @@
 // Fake data (replace this with a real fetch)
-import fakeFetch from "scripts/fakeFetch";
+//import fakeFetch from "scripts/fakeFetch";
 
 // Node modules
 import { useEffect, useState } from "react";
@@ -18,6 +18,12 @@ import FieldsTVSeries from "data/fields-tv-series.json";
 import eStatus from "types/eStatus";
 import iMedia from "types/iMedia";
 import { useModal } from "state/ModalContext";
+import { ARI_ENDPOINT } from "constants/api";
+
+interface iResponse {
+  status: string;
+  data: Array<any> | any;
+}
 
 export default function AdminMedia() {
   // Global state
@@ -29,13 +35,14 @@ export default function AdminMedia() {
   const [data, setData] = useState(new Array<iMedia>());
 
   // Properties
-  const endPoint: string = "media/";
+  const endPoint: string = `${ARI_ENDPOINT}media/`;
   const fields = chooseFields(code);
 
   // Methods
   useEffect(() => {
-    fakeFetch(endPoint + code + "/")
-      .then((response) => onSuccess(response.data))
+    fetch(endPoint + code)
+      .then((response) => response.json())
+      .then((data) => onSuccess(data))
       .catch((error) => onFailure(error));
   }, [code]);
 
@@ -63,9 +70,14 @@ export default function AdminMedia() {
   }
 
   // Components
-  const Create = <FormCreate fields={fields} endPoint={endPoint} />;
+  const Create = <FormCreate fields={fields} endPoint={endPoint + code} />;
   const Items = data.map((item) => (
-    <Item key={item.id} item={item} endPoint={endPoint} fields={fields} />
+    <Item
+      key={item.id}
+      item={item}
+      endPoint={endPoint + code}
+      fields={fields}
+    />
   ));
 
   // Safeguards

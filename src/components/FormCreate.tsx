@@ -4,7 +4,8 @@ import { FormEvent, useState } from "react";
 // Project files
 import ListInput from "components/ListInput";
 import { useModal } from "state/ModalContext";
-import fakeFetch from "scripts/fakeFetch";
+import ApiMethod from "types/eApiMethods";
+import { HEADERS } from "constants/api";
 
 interface iProps {
   endPoint: string;
@@ -18,10 +19,17 @@ export default function FormCreate({ endPoint, fields }: iProps) {
   // Local state
   const [form, setForm] = useState({});
 
+  // Derived state
+  const createEndpoint = endPoint + "/create";
+
   // Methods
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    fakeFetch(endPoint + "create/", form)
+    fetch(createEndpoint, {
+      method: ApiMethod.POST,
+      headers: HEADERS,
+      body: JSON.stringify(form),
+    })
       .then(onSuccess)
       .catch((error) => onFailure(error));
   }
@@ -35,6 +43,8 @@ export default function FormCreate({ endPoint, fields }: iProps) {
     console.error(error);
     alert("Could not create item");
   }
+
+  console.log({ form });
 
   return (
     <form className="form" onSubmit={onSubmit}>
